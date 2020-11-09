@@ -42,5 +42,9 @@
         "geoserver"
     ],
     "dependencies": [],
-    "bibtex": []
+    "bibtex": [],
+    "labels": [
+        "Type/Shapefile",
+        "Domain/Geo"
+    ]
 }

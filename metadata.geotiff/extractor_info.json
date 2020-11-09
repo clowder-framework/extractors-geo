@@ -31,5 +31,9 @@
   ],
   "external_services": [],
   "dependencies": ["geoprocessing", "gdal"],
-  "bibtex": []
+  "bibtex": [],
+  "labels": [
+      "Type/Image",
+      "Domain/Geo"
+  ]
 }
