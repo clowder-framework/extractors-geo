@@ -144,7 +144,7 @@ class Client:
 
         # upload geotiff
         if is_workspace:
-            url = self.restserver + "/workspaces/" + workspace + "/coveragestores/" + storename + "/file.geotiff" + "?coverageName=" + storename
+            url = self.restserver + "workspaces/" + workspace + "/coveragestores/" + storename + "/file.geotiff" + "?coverageName=" + storename
 
             response = None
             self.logger.debug(url)
@@ -160,10 +160,10 @@ class Client:
         # create workspace if not present
         is_workspace = False
 
-        response_worksp = requests.get(self.restserver + '/workspaces/' + workspace, auth=(self.username, self.password))
+        response_worksp = requests.get(self.restserver + 'workspaces/' + workspace, auth=(self.username, self.password))
         if response_worksp.status_code != 200:
             new_worksp = "<workspace><name>" + workspace + "</name></workspace>"
-            response_worksp = requests.post(self.restserver + '/workspaces', headers={"Content-type": "text/xml"},
+            response_worksp = requests.post(self.restserver + 'workspaces', headers={"Content-type": "text/xml"},
                                             auth=(self.username, self.password), data=new_worksp)
             if response_worksp.status_code == 201:
                 is_workspace = True
@@ -172,7 +172,7 @@ class Client:
 
         # upload geotiff
         if is_workspace:
-            url = self.restserver + "/workspaces/" + workspace + "/coveragestores/" + storename + "/file.geotiff" + "?coverageName=" + storename
+            url = self.restserver + "workspaces/" + workspace + "/coveragestores/" + storename + "/file.geotiff" + "?coverageName=" + storename
 
             response = None
             self.logger.debug(url)
@@ -219,7 +219,7 @@ class Client:
         sldFile.write(styleStr)
         sldFile.close()
 
-        url = self.restserver+"/styles"
+        url = self.restserver+"styles"
         self.logger.debug(url)
         response = requests.post(url, headers={'content-type':'text/xml'}, auth=(self.username, self.password), data="<style><name>" + storename + "</name><filename>" + storename + ".sld</filename></style>")
         if response.status_code != 201:
