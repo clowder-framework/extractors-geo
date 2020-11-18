@@ -1,3 +1,5 @@
+import errno
+
 from geoserver.catalog import Catalog
 import requests
 import os.path
@@ -8,7 +10,7 @@ import logging
 
 class Client:
     
-    def __init__ (self, geoserver, username, password):
+    def __init__(self, geoserver, username, password):
         self.restserver = urlparse.urljoin(geoserver, 'rest/')
         self.wmsserver = urlparse.urljoin(geoserver, 'wms')
         self.username = username
@@ -25,9 +27,9 @@ class Client:
         logging.getLogger('pyclowder').setLevel(logging.DEBUG)
         logging.getLogger('__main__').setLevel(logging.DEBUG)
 
-    ## this method assume that there is 1 store per layer
+    # this method assume that there is 1 store per layer
     def getResourceByStoreName(self, storename, workspace):
-        if self.resource != None:
+        if self.resource is not None:
             self.logger.debug("resource instance found; no need to fetch")
             return self.resource
         self.logger.debug("catalog.get_store called")
@@ -35,7 +37,7 @@ class Client:
         self.logger.debug("catalog.get_resources called based on store")
         resources = self.catalog.get_resources(store=store)
         self.logger.debug("fetched resources from server")
-        if resources == None: 
+        if resources is None: 
             return None
         else:
             self.resource = resources[0]
@@ -63,7 +65,7 @@ class Client:
         self.logger.debug("get Layer by Resource started...")
         layers = self.catalog.get_layers(resource)
         self.logger.debug("fetched layers from the server")
-        if layers == None: 
+        if layers is None: 
             return None
         else:
             self.layer = layers[0]
@@ -85,15 +87,15 @@ class Client:
         self.logger.debug("Creating wms metadata ... ") 
         metadata = {}
         layername = None
-        if self.layerName == None:
-            if self.layer == None:
+        if self.layerName is None:
+            if self.layer is None:
                 self.logger.debug("getResourceByStoreName..")
                 resource = self.getResourceByStoreName(storename, workspace)
                 self.logger.debug("getLayerByResource ...")
                 layer = self.getLayerByResource(resource)
                                 #layername = layer.name 
                 self.logger.debug("done getting layer name")
-                if layer == None: 
+                if layer is None: 
                     self.logger.debug('No layer found [DONE]')
                     return metadata
                 else:
@@ -115,7 +117,7 @@ class Client:
     def uploadShapefile(self, geoserver_url, workspace, storename, filename, projection, secret_key, proxy_on):
         self.logger.debug("Uploading shapefile" + filename +"...")
 
-        if (proxy_on.lower() == 'true'):
+        if proxy_on.lower() == 'true':
             self.logger.debug("proxy set to on ....")
             # TODO activate proxy_on method if the proxy in clowder works
             return self.geoserver_manipulation_proxy_off(geoserver_url, workspace, storename, filename, projection)
@@ -199,7 +201,7 @@ class Client:
     def set_projection(self,storename, workspace, projection):
         resource = self.getResourceByStoreName(storename, workspace)
 
-        if resource.projection == None:
+        if resource.projection is None:
             self.logger.debug('Setting projection' + projection)
             resource.projection = projection
             self.catalog.save(resource)
@@ -209,16 +211,16 @@ class Client:
     def createThumbnail(self, workspace, storename, extent, width, height):
         self.logger.debug('Creating Thumbnail ...')
         layername = None
-        if self.layerName == None:
-            if self.layer == None:
+        if self.layerName is None:
+            if self.layer is None:
                 self.logger.debug("getResourceByStoreName..")
                 resource = self.getResourceByStoreName(storename, workspace)
                 self.logger.debug("getLayerByResource ...")
                 layer = self.getLayerByResource(resource)
                 self.logger.debug("done getting layer name")
-                if layer == None: 
+                if layer is None: 
                     self.logger.debug('No layer found [DONE]')
-                    return metadata
+                    return ''
                 else:
                     layername = layer.name
             else:
@@ -229,7 +231,7 @@ class Client:
             self.logger.debug("layerName instance found: no need to fetch")
             layername = self.layerName
             #wmsLayerName = workspace+":"+layer.name
-            wmsLayerName = workspace+":"+layername
+        wmsLayerName = workspace+":"+layername
         url = self.wmsserver+"?request=GetMap&layers="+wmsLayerName+"&bbox="+extent+"&width="+width+"&height="+height+"&srs=EPSG:3857&format=image%2Fpng"
 
         r = requests.get(url, stream=True)

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import json
-import urllib
+import urllib.parse
 from osgeo import osr
 from osgeo import ogr
 import tempfile
@@ -193,17 +193,18 @@ class Utils:
         if str(prj_code).strip() != 'None':
             return prj_code
 
-        query = urllib.urlencode({'exact':True,'error':True,'mode':'wkt','terms':prj_txt})
-
-        try:
-            webres = urllib.urlopen('http://prj2epsg.org/search.json', query.encode())
-            jres = json.loads(webres.read().decode())
-            if len(jres['codes']) > 0: 
-                prj_code = jres['codes'][0]['code']
-            else: 
-                prj_code = 'None'
-        except:
-            prj_code = 'None'
+        # SERVICE IS DOWN :(
+        # query = urllib.parse.urlencode({'exact':True,'error':True,'mode':'wkt','terms':prj_txt})
+        #
+        # try:
+        #     webres = urllib.parse.urlopen('http://prj2epsg.org/search.json', query.encode())
+        #     jres = json.loads(webres.read().decode())
+        #     if len(jres['codes']) > 0:
+        #         prj_code = jres['codes'][0]['code']
+        #     else:
+        #         prj_code = 'None'
+        # except:
+        #     prj_code = 'None'
         
         return prj_code
 
