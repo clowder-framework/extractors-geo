@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import json
 import urllib
+import urllib.parse
 import requests
 from osgeo import osr
 from osgeo import ogr
