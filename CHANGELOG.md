@@ -4,8 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.1.2 - 2021-07-21
 ### Fixed
-- Fix the tiff file extension. 
+- Shapfile previewer bounding box not created properly for projections that have their axis
+  reversed. [#23](https://github.com/clowder-framework/extractors-geo/issues/23)
+- Added more labels to extractor_info. [PR#12](https://github.com/clowder-framework/extractors-geo/pull/12)
+- Missing field in catch exception code. [PR#22](https://github.com/clowder-framework/extractors-geo/pull/22)
+
+## 2.1.1 - 2021-10-30
+- Updated extractor to python 3.7. [PR#7](https://github.com/clowder-framework/extractors-geo/pull/7)
+- Fix the tiff file extension. [PR#11](https://github.com/clowder-framework/extractors-geo/pull/11/files)
 
 ## 1.0.2 - 2019-05-29
 ### Fixed
