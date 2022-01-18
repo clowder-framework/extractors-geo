@@ -11,7 +11,7 @@ VOLUME /data
 EXPOSE 8080
 
 # dowload geoserver
-RUN wget --quiet http://sourceforge.net/projects/geoserver/files/GeoServer/${GEOSERVER_VERSION}/geoserver-${GEOSERVER_VERSION}-bin.zip \
+RUN wget --quiet https://sourceforge.net/projects/geoserver/files/GeoServer/${GEOSERVER_VERSION}/geoserver-${GEOSERVER_VERSION}-bin.zip \
     && unzip -q geoserver-${GEOSERVER_VERSION}-bin.zip \
     && rm geoserver-${GEOSERVER_VERSION}-bin.zip \
     && mv geoserver-${GEOSERVER_VERSION} /usr/share/geoserver \
@@ -19,17 +19,24 @@ RUN wget --quiet http://sourceforge.net/projects/geoserver/files/GeoServer/${GEO
     && mv /usr/share/geoserver/data_dir /data_dir
 
 # download and install csw
-RUN wget --quiet http://sourceforge.net/projects/geoserver/files/GeoServer/${GEOSERVER_VERSION}/extensions/geoserver-${GEOSERVER_VERSION}-csw-plugin.zip \
+RUN wget --quiet https://sourceforge.net/projects/geoserver/files/GeoServer/${GEOSERVER_VERSION}/extensions/geoserver-${GEOSERVER_VERSION}-csw-plugin.zip \
     && unzip -q geoserver-${GEOSERVER_VERSION}-csw-plugin.zip \
     && mv *.jar /usr/share/geoserver/webapps/geoserver/WEB-INF/lib/. \
     && rm geoserver-${GEOSERVER_VERSION}-csw-plugin.zip
 
 # download and install jetty utility servlet for CORS
-RUN wget --quiet http://central.maven.org/maven2/org/eclipse/jetty/jetty-servlets/9.2.13.v20150730/jetty-servlets-9.2.13.v20150730.jar \
+RUN wget --quiet https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-servlets/9.2.13.v20150730/jetty-servlets-9.2.13.v20150730.jar \
     && mv *.jar /usr/share/geoserver/webapps/geoserver/WEB-INF/lib/. \
     && sed -i "s|<!-- <filter>|<filter>|g" /usr/share/geoserver/webapps/geoserver/WEB-INF/web.xml \
     && sed -i "s|</filter> -->|</filter>|g" /usr/share/geoserver/webapps/geoserver/WEB-INF/web.xml \
     && sed -i "s|<!-- <filter-mapping>|<filter-mapping>|g" /usr/share/geoserver/webapps/geoserver/WEB-INF/web.xml \
     && sed -i "s|</filter-mapping> -->|</filter-mapping>|g" /usr/share/geoserver/webapps/geoserver/WEB-INF/web.xml
+
+# fix log4j
+RUN apt-get -q update && apt-get install zip && \
+    for x in $(find / -name \*.jar); do \
+      zip -d $x org/apache/log4j/net/JMSAppender.class org/apache/log4j/net/SocketServer.class | grep "deleting:"; \
+    done; \
+    apt-get clean
 
 CMD /usr/share/geoserver/bin/startup.sh
