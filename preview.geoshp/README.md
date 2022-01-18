@@ -7,7 +7,14 @@ geoshp extractor takes .zip input file and communicates with GeoServer (https://
       docker build -t clowder/extractors-geoshp-preview .
 
 ## Test the docker container image:
-      docker run --name=geoshp -d --restart=always -e 'RABBITMQ_URI=amqp://user1:pass1@rabbitmq.ncsa.illinois.edu:5672/clowder-dev' -e 'RABBITMQ_EXCHANGE=clowder' -e 'TZ=/usr/share/zoneinfo/US/Central' -e 'REGISTRATION_ENDPOINTS=http://dts-dev.ncsa.illinois.edu:9000/api/extractors?key=key1'  -e 'GEOSERVER_URL=geoserver url' -e 'GEOSERVER_PASSWORD=passwd' -e 'docker exec -it -u bdcli d47316abcb19 bashGEOSERVER_WORKSPACE=testing' -e 'GEOSERVER_USERNAME=username' clowder/extractors-geoshp-preview
+```
+      docker run --name=geoshp-preview -d
+      -e 'GEOSERVER_URL=http://localhost:8080/geoserver/' 
+      -e 'GEOSERVER_PASSWORD={geoserver passwd}' 
+      -e 'GEOSERVER_WORKSPACE=clowder' 
+      -e 'GEOSERVER_USERNAME={geoserver username}' 
+      clowder/extractors-geoshp-preview
+```
 
 ## To run without docker
 
@@ -43,5 +50,10 @@ To install and run the python extractor, do the following:
 6. Start extractor
 
    `./ncsa.geo.shp.py`
+
+## Known Issues
+- The WMS layer might have the wrong bouding box. The layer will be shown on the openlayers previewer but the map will
+  zoom to the wrong spot. We manually reproject the bounding box (see `zipshputils.findExtent()`). Some projections use 
+  reversed axis. For those we use a different formula. The list of projections requiring this is at `zipshputils.findExtent():231`. 
 
 
