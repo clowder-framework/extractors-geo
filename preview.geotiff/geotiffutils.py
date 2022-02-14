@@ -76,7 +76,7 @@ class Utils:
         if str(prj_code).strip() != 'None':
             return prj_code
 
-        query = urllib.urlencode({'exact':True,'error':True,'mode':'wkt','terms':prj_txt})
+        query = urllib.parse.urlencode({'exact':True,'error':True,'mode':'wkt','terms':prj_txt})
 
         try:
             webres = urllib.urlopen('http://prj2epsg.org/search.json', query.encode())
