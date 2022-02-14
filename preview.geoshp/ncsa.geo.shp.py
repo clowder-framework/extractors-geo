@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-import copy
-import requests
+
 import logging
 import os
 import tempfile
@@ -19,6 +18,7 @@ import pyclowder.files
 import gsclient as gs
 import zipshputils as zs
 from geoserver.catalog import Catalog
+
 
 class ExtractorsGeoshpPreview(Extractor):
     def __init__(self):
@@ -55,7 +55,7 @@ class ExtractorsGeoshpPreview(Extractor):
                     logger.debug("mimetype: %s for fileid %s " % (mimetype, str(fileid)))
                 filename = parameters.get('source').get('extra').get('filename')
                 if filename is None:
-                    logger.warn('can not get filename for fileid %s' % str(fileid))
+                    logger.warning('can not get filename for fileid %s' % str(fileid))
 
                 storename = filename + '_' + str(fileid)
                 self.logger.debug("geoserver store name %s" % storename)
@@ -75,6 +75,7 @@ class ExtractorsGeoshpPreview(Extractor):
 
         """Process the compressed shapefile and create geoserver layer"""
         tmpfile = None
+        # noinspection PyBroadException
         try:
             filename = resource['name']
             inputfile = resource["local_paths"][0]
@@ -133,8 +134,8 @@ class ExtractorsGeoshpPreview(Extractor):
                 pyclowder.files.upload_metadata(connector, host, secret_key, fileid, metadata)
                 self.logger.debug("upload previewer")
 
-        except Exception as ex:
-            self.logger.debug(ex)
+        except Exception:
+            self.logger.exception("Could not upload zipfile")
         finally:
             try:
                 os.remove(tmpfile)
@@ -161,19 +162,14 @@ class ExtractorsGeoshpPreview(Extractor):
             cat.reload()
             self.logger.debug("deleting the store...")
             cat.delete(store)
-            cat.reload
+            cat.reload()
         except Exception:
             self.logger.error("Failed to remove from geoserver")
 
     def extractZipShp(self, inputfile, fileid, filename, secret_key):
         self.logger.debug("start zip shp extraction....")
         storename = fileid
-        msg = {}
-        msg['errorMsg'] = []
-        msg['WMS Layer Name'] = ''
-        msg['WMS Service URL'] = ''
-        msg['WMS Layer URL'] = ''
-        msg['isZipShp'] = False
+        msg = {'errorMsg': [], 'WMS Layer Name': '', 'WMS Service URL': '', 'WMS Layer URL': '', 'isZipShp': False}
 
         uploadfile = inputfile
         combined_name = filename + "_" + storename
@@ -201,7 +197,7 @@ class ExtractorsGeoshpPreview(Extractor):
             else:
                 geoserver_rest = self.geoServer
 
-            if zipshp.getEpsg() == 'UNKNOWN' or zipshp.getEpsg() == None:
+            if zipshp.getEpsg() == 'UNKNOWN' or zipshp.getEpsg() is None:
                 epsg = "EPSG:4326"
             else:
                 epsg = "EPSG:" + zipshp.getEpsg()
@@ -209,7 +205,8 @@ class ExtractorsGeoshpPreview(Extractor):
             self.logger.debug("geoserver workspace %s" % self.gs_workspace)
             self.logger.debug("uploading file name %s" % uploadfile)
             self.logger.debug("start uploading shapefile to geoserver....")
-            success = gsclient.uploadShapefile(geoserver_rest, self.gs_workspace, combined_name, uploadfile, epsg, secret_key, self.proxy_on)
+            success = gsclient.uploadShapefile(geoserver_rest, self.gs_workspace,
+                                               combined_name, uploadfile, epsg, secret_key, self.proxy_on)
 
             if success:
                 self.logger.debug("uploading shapefile to geoserver ---->success")
@@ -243,7 +240,7 @@ class ExtractorsGeoshpPreview(Extractor):
                 msg['errorMsg'].append("Fail to upload the file to geoserver")
         else:
             error = zipshp.zipShpProp
-            if error['shpFile'] == None:
+            if error['shpFile'] is None:
                 msg['isZipShp'] = False
                 msg['errorMsg'].append("normal compressed file")
                 return msg
@@ -256,17 +253,17 @@ class ExtractorsGeoshpPreview(Extractor):
                 msg['errorMsg'].append("a compressed shapefile can not have multiple shpefiles")
                 return msg
 
-            if error['hasSameName'] == False:
+            if not error['hasSameName']:
                 msg['errorMsg'].append("a shapefile files (.shp, .shx, .dbf, .prj) should have same name")
                 return msg
 
-            if error['shxFile'] == None:
+            if error['shxFile'] is None:
                 msg['errorMsg'].append(".shx file is missing")
 
-            if error['dbfFile'] == None:
+            if error['dbfFile'] is None:
                 msg['errorMsg'].append(".dbf file is missing")
 
-            if error['prjFile'] == None:
+            if error['prjFile'] is None:
                 msg['errorMsg'].append(".prj file is missing")
 
             if error['epsg'] == 'UNKNOWN':
@@ -275,6 +272,7 @@ class ExtractorsGeoshpPreview(Extractor):
             if error['extent'] == 'UNKNOWN':
                 msg['errorMsg'].append("The extent could not be calculated")
         return msg
+
 
 if __name__ == "__main__":
     extractor = ExtractorsGeoshpPreview()
