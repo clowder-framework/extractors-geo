@@ -225,20 +225,34 @@ class Utils:
             self.logger.debug('findExtent: Unknown projection; could not calculate extent')
             return 'None'
 
+        original_epsg = int(self.zipShpProp['epsg'])
+
+        # list of EPSG using reversed axis
+        # TODO mote this to a more central place
+        epsg_reverse_axis = [3413]
+
         shpfile = ogr.Open(self.zipShpProp['shpFile'])
         osrs = osr.SpatialReference()
-        osrs.ImportFromEPSG(int(self.zipShpProp['epsg']))
+        osrs.ImportFromEPSG(original_epsg)
         dsrs = osr.SpatialReference()
         dsrs.ImportFromEPSG(3857) # google projeciton in epsg code
         ct = osr.CoordinateTransformation(osrs, dsrs)
         layer = shpfile.GetLayer(0)
         a = layer.GetExtent()
+        # TODO figure out why we do this
         proj = layer.GetSpatialRef()
         if proj.GetAttrValue("AUTHORITY", 1) == '4326':
             a = self.validateBbox(a)
-        ab = ct.TransformPoint(a[2], a[0],0)
-        cd = ct.TransformPoint(a[3], a[1],0)
-        r= [ab[0], ab[1], cd[0], cd[1]]
+
+        # re-project bounding box based on whether the projection using reversed axis or not
+        if original_epsg in epsg_reverse_axis:
+            ab = ct.TransformPoint(a[0], a[2], 0)
+            cd = ct.TransformPoint(a[1], a[3], 0)
+            r = [cd[0], ab[1], ab[0], cd[1]]
+        else:
+            ab = ct.TransformPoint(a[2], a[0], 0)
+            cd = ct.TransformPoint(a[3], a[1], 0)
+            r = [ab[0], ab[1], cd[0], cd[1]]
 
         return ','.join(map(str,r))
 

@@ -30,7 +30,7 @@ class ExtractorsGeoshpPreview(Extractor):
         self.extractorName = os.getenv('RABBITMQ_QUEUE', "ncsa.geoshp.preview")
         self.geoServer = os.getenv('GEOSERVER_URL')
         self.gs_username = os.getenv('GEOSERVER_USERNAME', 'admin')
-        self.gs_password = os.getenv('GEOSERVER_PASSWORD', 'geosever')
+        self.gs_password = os.getenv('GEOSERVER_PASSWORD', 'geoserver')
         self.proxy_url = os.getenv('PROXY_URL', 'http://localhost:9000/api/proxy/')
         self.proxy_on = os.getenv('PROXY_ON', 'false')
 
