@@ -1,50 +1,50 @@
 {
-    "@context": "http://clowder.ncsa.illinois.edu/contexts/extractors.jsonld",
-    "name": "ncsa.geoshp.preview",
-    "version": "2.1.2",
-    "description": "gepshp extractor takes .zip input file to communicate with geoserver to retrieve WMS metadata",
-    "author": "Jong Lee <jonglee1@illinois.edu>",
-    "contributors": [
-        "Luigi Marini <lmarini@illinois.edu>",
-        "Rob Kooper <kooper@illinois.edu>",
-        "Yong Wook Kim <ywkim@illinois.edu>",
-	    "Bing Zhang <bing@illinois.edu>"
+  "@context": "http://clowder.ncsa.illinois.edu/contexts/extractors.jsonld",
+  "name": "ncsa.geoshp.preview",
+  "version": "2.1.3",
+  "description": "gepshp extractor takes .zip input file to communicate with geoserver to retrieve WMS metadata",
+  "author": "Jong Lee <jonglee1@illinois.edu>",
+  "contributors": [
+    "Luigi Marini <lmarini@illinois.edu>",
+    "Rob Kooper <kooper@illinois.edu>",
+    "Yong Wook Kim <ywkim@illinois.edu>",
+    "Bing Zhang <bing@illinois.edu>"
+  ],
+  "contexts": [
+    {
+      "WMS Layer Name": "http://clowder.ncsa.illinois.edu/metadata/ncsa.geoshp.preview#WMS Layer Name",
+      "WMS Service URL": "http://clowder.ncsa.illinois.edu/metadata/ncsa.geoshp.preview#WMS Service URL",
+      "WMS Layer URL": "http://clowder.ncsa.illinois.edu/metadata/ncsa.geoshp.preview#WMS Layer URL"
+    }
+  ],
+  "process": {
+    "dataset": [
+      "file.removed"
     ],
-    "contexts": [
-        {
-            "WMS Layer Name": "http://clowder.ncsa.illinois.edu/metadata/ncsa.geoshp.preview#WMS Layer Name",
-            "WMS Service URL":"http://clowder.ncsa.illinois.edu/metadata/ncsa.geoshp.preview#WMS Service URL",
-            "WMS Layer URL":  "http://clowder.ncsa.illinois.edu/metadata/ncsa.geoshp.preview#WMS Layer URL"
-        }
-    ],
-    "process": {
-        "dataset": [
-          "file.removed"
-        ],
-        "file": [
-            "multi.files-zipped",
-            "application/zip",
-            "application/x-zip",
-            "application/x-7z-compressed"
-        ]
-    },
-    "repository": [
-        {
-            "repType": "git",
-            "repUrl": "https://opensource.ncsa.illinois.edu/stash/scm/cats/extractors-geo.git"
-        },
-        {
-            "repType": "docker",
-            "repUrl": "clowder/extractors-geoshp-preview"
-        }
-    ],
-    "external_services": [
-        "geoserver"
-    ],
-    "dependencies": [],
-    "bibtex": [],
-    "labels": [
-        "Type/Shapefile",
-        "Domain/Geo"
+    "file": [
+      "multi.files-zipped",
+      "application/zip",
+      "application/x-zip",
+      "application/x-7z-compressed"
     ]
+  },
+  "repository": [
+    {
+      "repType": "git",
+      "repUrl": "https://opensource.ncsa.illinois.edu/stash/scm/cats/extractors-geo.git"
+    },
+    {
+      "repType": "docker",
+      "repUrl": "clowder/extractors-geoshp-preview"
+    }
+  ],
+  "external_services": [
+    "geoserver"
+  ],
+  "dependencies": [],
+  "bibtex": [],
+  "labels": [
+    "Type/Shapefile",
+    "Domain/Geo"
+  ]
 }

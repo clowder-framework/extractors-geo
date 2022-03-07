@@ -3,4 +3,4 @@ shapely>=1.3.2
 pygeoprocessing==2.1.1
 pika>=0.10.0
 requests>=2.9.1
-pyclowder==2.3.4
+pyclowder==2.5.1
