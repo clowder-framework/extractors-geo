@@ -1,24 +1,24 @@
 {
   "@context": "http://clowder.ncsa.illinois.edu/contexts/extractors.jsonld",
   "name": "ncsa.geotiff.metadata",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Extractor to perform Geotiff.",
   "author": "Rui Liu <ruiliu@illinois.edu>",
   "contributors": [
-        "Yong Wook Kim <ywkim@illinois.edu>",
-	    "Bing Zhang <bing@illinois.edu>"
-    ],
+    "Yong Wook Kim <ywkim@illinois.edu>",
+    "Bing Zhang <bing@illinois.edu>"
+  ],
   "contexts": [
     {
       "raster": "http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.metadata#raster"
     }
   ],
   "process": {
-        "file": [
-          "image/tiff",
-          "image/tif"
-        ]
-    },
+    "file": [
+      "image/tiff",
+      "image/tif"
+    ]
+  },
   "repository": [
     {
       "repType": "git",
@@ -30,10 +30,13 @@
     }
   ],
   "external_services": [],
-  "dependencies": ["geoprocessing", "gdal"],
+  "dependencies": [
+    "geoprocessing",
+    "gdal"
+  ],
   "bibtex": [],
   "labels": [
-      "Type/Image",
-      "Domain/Geo"
+    "Type/Image",
+    "Domain/Geo"
   ]
 }
