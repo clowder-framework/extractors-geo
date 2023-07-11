@@ -110,27 +110,48 @@ class ExtractorsGeotiffPreview(Extractor):
                                             result['errorMsg'][i])
                     self.logger.info('[%s] : %s', fileid, result['errorMsg'][i], extra={'fileid': fileid})
             else:
-                # Context URL
-                context_url = "https://clowder.ncsa.illinois.edu/contexts/metadata.jsonld"
-                metadata = {
-                    "@context": [
-                        context_url,
-                        {
-                            'WMS Layer Name': 'http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Layer Name',
-                            'WMS Service URL': 'http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Service URL',
-                            'WMS Layer URL': 'http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Layer URL'
-                        }
-                    ],
+                result = {
+                    'WMS Layer Name': result['WMS Layer Name'],
+                    'WMS Service URL': result['WMS Service URL'],
+                    'WMS Layer URL': result['WMS Layer URL']
+                }
+                metadata = self.get_metadata(result, 'file', fileid, host)
+                self.logger.info(metadata)
+
+                metadata2 = {
+                    "dataset_id": resource["parent"].get("id", None),
                     'attachedTo': {'resourceType': 'file', 'id': parameters["id"]},
                     'agent': {
                         '@type': 'cat:extractor',
-                        'extractor_id': 'https://clowder.ncsa.illinois.edu/clowder/api/extractors/' + self.extractorName},
+                        'extractor_id': host + 'api/extractors/' + self.extractorName},
                     'content': {
                         'WMS Layer Name': result['WMS Layer Name'],
                         'WMS Service URL': result['WMS Service URL'],
                         'WMS Layer URL': result['WMS Layer URL']
                     }
                 }
+
+                # Context differs based on Clowder version
+                ver = int(os.getenv("CLOWDER_VERSION", "1"))
+                if ver == 2:
+                    metadata2["context"] = [
+                        {
+                            "WMS Layer Name": "http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Layer Name",
+                            "WMS Service URL": "http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Service URL",
+                            "WMS Layer URL": "http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Layer URL"
+                        }
+                    ]
+                else:
+                    metadata2["@context"] = [
+                        "https://clowder.ncsa.illinois.edu/contexts/metadata.jsonld",
+                        {
+                            'WMS Layer Name': 'http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Layer Name',
+                            'WMS Service URL': 'http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Service URL',
+                            'WMS Layer URL': 'http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Layer URL'
+                        }
+                    ]
+
+                self.logger.info(metadata2)
 
                 # register geotiff preview
                 (_, ext) = os.path.splitext(inputfile)
@@ -198,6 +219,12 @@ class ExtractorsGeotiffPreview(Extractor):
                 geoserver_rest = self.geoServer.replace(gs_domain, self.proxy_url)
             else:
                 geoserver_rest = self.geoServer
+
+            if not geoserver_rest.endswith("rest"):
+                if geoserver_rest.endswith("/"):
+                    geoserver_rest += "rest"
+                else:
+                    geoserver_rest += "/rest"
 
             epsg = "EPSG:" + str(geotiffUtil.getEpsg())
             style = None
