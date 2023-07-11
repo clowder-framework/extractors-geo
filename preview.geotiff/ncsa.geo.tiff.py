@@ -110,48 +110,22 @@ class ExtractorsGeotiffPreview(Extractor):
                                             result['errorMsg'][i])
                     self.logger.info('[%s] : %s', fileid, result['errorMsg'][i], extra={'fileid': fileid})
             else:
-                result = {
-                    'WMS Layer Name': result['WMS Layer Name'],
-                    'WMS Service URL': result['WMS Service URL'],
-                    'WMS Layer URL': result['WMS Layer URL']
-                }
-                metadata = self.get_metadata(result, 'file', fileid, host)
-                self.logger.info(metadata)
-
-                metadata2 = {
-                    "dataset_id": resource["parent"].get("id", None),
-                    'attachedTo': {'resourceType': 'file', 'id': parameters["id"]},
-                    'agent': {
-                        '@type': 'cat:extractor',
-                        'extractor_id': host + 'api/extractors/' + self.extractorName},
-                    'content': {
+                # While running in docker, might need some magic to fix docker URL vs. external URL in metadata entries
+                metadata_geo_host = os.getenv("EXTERNAL_GEOSERVER_URL", "")
+                if len(metadata_geo_host) > 0:
+                    internal_geo_host = os.getenv("GEOSERVER_URL", "")
+                    result = {
+                        'WMS Layer Name': result['WMS Layer Name'],
+                        'WMS Service URL': result['WMS Service URL'].replace(internal_geo_host, metadata_geo_host),
+                        'WMS Layer URL': result['WMS Layer URL'].replace(internal_geo_host, metadata_geo_host)
+                    }
+                else:
+                    result = {
                         'WMS Layer Name': result['WMS Layer Name'],
                         'WMS Service URL': result['WMS Service URL'],
                         'WMS Layer URL': result['WMS Layer URL']
                     }
-                }
-
-                # Context differs based on Clowder version
-                ver = int(os.getenv("CLOWDER_VERSION", "1"))
-                if ver == 2:
-                    metadata2["context"] = [
-                        {
-                            "WMS Layer Name": "http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Layer Name",
-                            "WMS Service URL": "http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Service URL",
-                            "WMS Layer URL": "http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Layer URL"
-                        }
-                    ]
-                else:
-                    metadata2["@context"] = [
-                        "https://clowder.ncsa.illinois.edu/contexts/metadata.jsonld",
-                        {
-                            'WMS Layer Name': 'http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Layer Name',
-                            'WMS Service URL': 'http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Service URL',
-                            'WMS Layer URL': 'http://clowder.ncsa.illinois.edu/metadata/ncsa.geotiff.preview#WMS Layer URL'
-                        }
-                    ]
-
-                self.logger.info(metadata2)
+                metadata = self.get_metadata(result, 'file', fileid, host)
 
                 # register geotiff preview
                 (_, ext) = os.path.splitext(inputfile)
@@ -160,6 +134,7 @@ class ExtractorsGeotiffPreview(Extractor):
                 # logger.debug("upload previewer")
                 # extractors.upload_file_metadata_jsonld(mdata=metadata, parameters=parameters)
                 # logger.debug("upload file metadata")
+                host = os.getenv("CLOWDER_URL", host)
                 pyclowder.files.upload_metadata(connector, host, secret_key, fileid, metadata)
                 self.logger.debug("upload file metadata")
 
