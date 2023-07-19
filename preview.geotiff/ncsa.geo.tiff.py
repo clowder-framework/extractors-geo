@@ -2,6 +2,7 @@
 
 import logging
 import os
+import json
 import subprocess
 import tempfile
 from urllib.parse import urlparse, urljoin
@@ -127,16 +128,33 @@ class ExtractorsGeotiffPreview(Extractor):
                     }
                 metadata = self.get_metadata(result, 'file', fileid, host)
 
-                # register geotiff preview
-                (_, ext) = os.path.splitext(inputfile)
-                (_, tmpfile) = tempfile.mkstemp(suffix=ext)
-                # extractors.upload_preview(previewfile=tmpfile, parameters=parameters)
-                # logger.debug("upload previewer")
-                # extractors.upload_file_metadata_jsonld(mdata=metadata, parameters=parameters)
-                # logger.debug("upload file metadata")
-                host = os.getenv("CLOWDER_URL", host)
-                pyclowder.files.upload_metadata(connector, host, secret_key, fileid, metadata)
-                self.logger.debug("upload file metadata")
+                # register geotiff WMS layers with Clowder
+                CLOWDER_VERSION = os.getenv("CLOWDER_VERSION", 1)
+                if int(CLOWDER_VERSION) == 2:
+                    # upload visualization URL
+                    payload = json.dumps({
+                        "resource": {
+                            "collection": "files",
+                            "resource_id": fileid
+                        },
+                        "client": host,
+                        "parameters": result,
+                        "visualization_mimetype": "image/tiff",
+                        "visualization_component_id": "geoserver-viewer-component"
+                    })
+                    headers = {
+                        "X-API-KEY": secret_key,
+                        "Content-Type": "application/json"
+                    }
+                    host = os.getenv("CLOWDER_URL", host)
+                    connector.post('%sapi/v2/visualizations/config' % host, headers=headers, data=payload,
+                                   verify=connector.ssl_verify if connector else True)
+                else:
+                    (_, ext) = os.path.splitext(inputfile)
+                    (_, tmpfile) = tempfile.mkstemp(suffix=ext)
+                    host = os.getenv("CLOWDER_URL", host)
+                    pyclowder.files.upload_metadata(connector, host, secret_key, fileid, metadata)
+                    self.logger.debug("upload file metadata")
 
         except:
             self.logger.exception("Error uploading metadata")
