@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 MAINTAINER Yong Wook Kim <ywkim@illinois.edu>
 
 ARG VERSION="unknown"
-ARG BUILDNUMBER="unknown"
+ARG BUILDNUMBER="unknown
 ARG GITSHA1="unknown"
 
 # copy requirements file
