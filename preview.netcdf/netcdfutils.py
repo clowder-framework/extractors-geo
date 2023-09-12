@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import mpl_toolkits
 from mpl_toolkits.basemap import Basemap
+plt.rcParams['figure.figsize'] = (16.0, 12.0)
 
 sample_file = 'ASJP_Year_2023_Day_217.nc4'
 # sample_file = 'pr_2020.nc'
@@ -51,7 +52,8 @@ def main():
     m2.drawcountries()
     m2.drawparallels(np.arange(-90., 91., 30.))
     m2.drawmeridians(np.arange(-180., 181., 60.))
-    plt.show()
+    plt.savefig('polar.png')
+    # plt.show()
 
     # Add Colorbar
     print('here')
