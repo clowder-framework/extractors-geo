@@ -20,12 +20,9 @@ plt.rcParams['figure.figsize'] = (16.0, 12.0)
 
 # sample_file = 'ASJP_Year_2023_Day_218.nc4'
 
-# setup logging for the exctractor
-logging.getLogger('pyclowder').setLevel(logging.DEBUG)
-logging.getLogger('__main__').setLevel(logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 def generate_plots(current_filepath, current_filename, projection="Mercator"):
+    logger = logging.getLogger(__name__)
     ds = Dataset(current_filepath)
 
     variable_names = ds.variables.keys()
@@ -64,7 +61,8 @@ def generate_plots(current_filepath, current_filename, projection="Mercator"):
 
                 plt.clf()
         except Exception as e:
-            print("Error with variable", variable_name)
+            logger.debug("Error with variable", variable_name)
+            logger.debug(e)
 
 
 class PDG_ASJP_NetCDF(Extractor):
@@ -79,14 +77,24 @@ class PDG_ASJP_NetCDF(Extractor):
         # parse command line and load default logging configuration
         self.setup()
 
+        logging.basicConfig(level=logging.INFO)
+        # setup logging for the exctractor
+
+
+        logging.getLogger('pyclowder').setLevel(logging.DEBUG)
+        logging.getLogger('__main__').setLevel(logging.DEBUG)
+
     def process_message(self, connector, host, secret_key, resource, parameters, projection="Polar Stereographic'"):
         # Process the file and upload the results
+
+        logger = logging.getLogger(__name__)
 
         inputfile = resource["local_paths"][0]
         file_id = resource['id']
         file_name = resource['name']
         # These process messages will appear in the Clowder UI under Extractions.
         connector.message_process(resource, "Loading contents of file...")
+        logger.debug("Preparing to generate plots")
         generate_plots(current_filepath=inputfile, current_filename=file_name, projection='Polar Stereographic')
 
         print('we generated plots!!')
