@@ -79,7 +79,7 @@ class PDG_ASJP_NetCDF(Extractor):
         # parse command line and load default logging configuration
         self.setup()
 
-    def process_message(self, connector, host, secret_key, resource, parameters):
+    def process_message(self, connector, host, secret_key, resource, parameters, projection="Polar Stereographic'"):
         # Process the file and upload the results
 
         inputfile = resource["local_paths"][0]
@@ -87,7 +87,7 @@ class PDG_ASJP_NetCDF(Extractor):
         file_name = resource['name']
         # These process messages will appear in the Clowder UI under Extractions.
         connector.message_process(resource, "Loading contents of file...")
-        generate_plots(current_filepath=inputfile, current_filename=file_name)
+        generate_plots(current_filepath=inputfile, current_filename=file_name, projection='Polar Stereographic')
 
         print('we generated plots!!')
 
