@@ -11,7 +11,7 @@ plt.rcParams['figure.figsize'] = (16.0, 12.0)
 
 sample_file_1 = 'ASJP_Year_2023_Day_218.nc4'
 sample_file_2 = 'soilw.mon.1991-2020.ltm.v2.nc'
-path_to_file = os.path.join(os.getcwd(), sample_file_1)
+path_to_file = os.path.join(os.getcwd(), sample_file_2)
 
 print(os.path.exists(path_to_file))
 print('exists?')
@@ -123,6 +123,7 @@ def generate_maps_for_file(path_to_file, projection='merc'):
 
                 plot_name = long_name + str(i) + '_' + str(non_matching_shape_size) + '.png'
                 plt.savefig(plot_name)
+                previews_returned.append(plot_name)
                 plt.clf()
         # if it is NOT time series data
         if len(non_matching_index) == 0:
@@ -149,8 +150,12 @@ def generate_maps_for_file(path_to_file, projection='merc'):
             cbar.set_ticks([min, max])
             plot_name = long_name + '.png'
             plt.savefig(plot_name)
+            previews_returned.append(plot_name)
             plt.clf()
+    return previews_returned
+
 
 
 if __name__ == "__main__":
-    generate_maps_for_file(path_to_file=path_to_file)
+    returned = generate_maps_for_file(path_to_file=path_to_file)
+    print('done')

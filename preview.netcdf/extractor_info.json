@@ -18,7 +18,7 @@
     },
     {
       "repType": "docker",
-      "repUrl": "clowder/extractors-pdg-asjp-netcdf-preview"
+      "repUrl": "clowder/extractors-geo-netcdf-preview"
     }
   ],
   "process": {

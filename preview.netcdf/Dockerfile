@@ -27,8 +27,8 @@ ENV VERSION=${VERSION} \
     RABBITMQ_URI="" \
     RABBITMQ_EXCHANGE="clowder" \
     RABBITMQ_VHOST="%2F" \
-    RABBITMQ_QUEUE="ncsa.pdg.asjp.netdcdf.preview" \
-    MAIN_SCRIPT="pdg.asjp.netcdf.extractor.py"
+    RABBITMQ_QUEUE="ncsa.geo.netdcdf.extractor" \
+    MAIN_SCRIPT="ncsa.geo.netcdf.extractor.py"
 
 # copy rest of the files needed
 COPY entrypoint.sh *.py extractor_info.json /home/clowder/
