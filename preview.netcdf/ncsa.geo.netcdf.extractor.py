@@ -4,6 +4,7 @@
 
 import logging
 import subprocess
+import json
 import pyclowder
 from pyclowder.extractors import Extractor
 import pyclowder.files
@@ -44,6 +45,7 @@ class GeoNetCDF(Extractor):
         # Process the file and upload the results
 
         logger = logging.getLogger(__name__)
+        params = json.loads(parameters['parameters'])
 
         inputfile = resource["local_paths"][0]
         file_id = resource['id']

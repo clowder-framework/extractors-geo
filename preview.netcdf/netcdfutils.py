@@ -9,12 +9,16 @@ from mpl_toolkits.basemap import Basemap
 plt.rcParams['figure.figsize'] = (16.0, 12.0)
 
 #
-# sample_file_1 = 'ASJP_Year_2023_Day_218.nc4'
-# sample_file_2 = 'soilw.mon.1991-2020.ltm.v2.nc'
-# path_to_file = os.path.join(os.getcwd(), sample_file_2)
+sample_file_1 = 'ASJP_Year_2023_Day_218.nc4'
+sample_file_2 = 'soilw.mon.1991-2020.ltm.v2.nc'
+sample_file_3 = 'air.2x2.250.mon.1991-2020.ltm.comb.nc'
+sample_file_4 = 'air.mon.mean.nc'
+sample_file_5 = 'adaptor.mars.internal-1696624738.5653653-18904-2-b0069ad2-7c40-4404-acd9-d7cf76870e2a.nc'
+sample_file_6 = 'adaptor.mars.internal-1696625608.8176327-14431-17-11b1bdd3-05c6-42ee-b9d4-dee178830ba1.nc'
+path_to_file = os.path.join(os.getcwd(), sample_file_1)
 #
-# print(os.path.exists(path_to_file))
-# print('exists?')
+print(os.path.exists(path_to_file))
+print('exists?')
 
 
 
@@ -78,15 +82,22 @@ def generate_maps_for_file(path_to_file, projection='merc'):
             units = current_variable.units
         except Exception as e:
             print("no units")
-        non_matching_index = []
+        not_lat_lon_indices = []
         current_variable_shape = current_variable.shape
         current_variable_shape_list = list(current_variable_shape)
         for i in range(0, len(current_variable_shape_list)):
             if current_variable.shape[i] not in lat_lon_shape_values:
-                non_matching_index.append(i)
+                not_lat_lon_indices.append(i)
+                print('what does this variable have')
         variable_data = current_variable[:]
-        if len(non_matching_index) == 1:
-            non_matching_shape_size = current_variable.shape[non_matching_index[0]]
+        if len(not_lat_lon_indices) == 2:
+            print('it is more than one')
+            print('we need to find the time variable')
+            for index in not_lat_lon_indices:
+                value = current_variable[:][index]
+                print('value')
+        if len(not_lat_lon_indices) == 1:
+            non_matching_shape_size = current_variable.shape[not_lat_lon_indices[0]]
             quarter_time = int(np.floor(non_matching_shape_size / 4))
             # with time series data, we will show quarterly previews
 
@@ -106,8 +117,8 @@ def generate_maps_for_file(path_to_file, projection='merc'):
                 squeezed_data = np.squeeze(current_time_variable_data)
                 max = np.nanmax(squeezed_data)
                 min = np.nanmin(squeezed_data)
-                if min > 0:
-                    min = 0
+                # if min > 0:
+                #     min = 0
                 cs2 = m2.pcolor(xi, yi, squeezed_data)
                 m2.drawcoastlines()
                 m2.drawcountries()
@@ -119,14 +130,14 @@ def generate_maps_for_file(path_to_file, projection='merc'):
                 title = long_name
                 if units:
                     title = title + '('+str(units)+')'
-                plt.title(title)
+                plt.title(title , fontdict={'fontsize': 26})
 
                 plot_name = long_name + str(i) + '_' + str(non_matching_shape_size) + '.png'
                 plt.savefig(plot_name)
                 previews_returned.append(plot_name)
                 plt.clf()
         # if it is NOT time series data
-        if len(non_matching_index) == 0:
+        if len(not_lat_lon_indices) == 0:
             m2 = Basemap(projection='merc', llcrnrlat=-80, urcrnrlat=80,
                          llcrnrlon=-180, urcrnrlon=180, lat_ts=20, resolution='c')
             # if we need to use a meshgrid for 1 dimensional lat and lon
@@ -138,8 +149,8 @@ def generate_maps_for_file(path_to_file, projection='merc'):
             squeezed_data = np.squeeze(variable_data)
             max = np.nanmax(squeezed_data)
             min = np.nanmin(squeezed_data)
-            if min > 0:
-                min = 0
+            # if min > 0:
+            #     min = 0
             cs2 = m2.pcolor(xi, yi, squeezed_data)
             m2.drawcoastlines()
             m2.drawcountries()
@@ -153,3 +164,6 @@ def generate_maps_for_file(path_to_file, projection='merc'):
             previews_returned.append(plot_name)
             plt.clf()
     return previews_returned
+
+if __name__ == "__main__":
+    generate_maps_for_file(path_to_file=path_to_file)

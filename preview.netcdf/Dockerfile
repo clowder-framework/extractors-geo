@@ -1,9 +1,5 @@
 FROM ubuntu:20.04
 
-ARG VERSION="unknown"
-ARG BUILDNUMBER="unknown"
-ARG GITSHA1="unknown"
-
 RUN apt-get update &&\
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3 \
