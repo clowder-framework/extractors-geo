@@ -43,6 +43,8 @@ jobs:
             FOLDER: preview.geotiff
           - name: pycsw
             FOLDER: pycsw.extractor
+          - name: preview-netcdf
+            FOLDER: preview.netcdf
     steps:
       - uses: actions/checkout@v2
 
