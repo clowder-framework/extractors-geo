@@ -140,7 +140,7 @@ class ExtractorsGeoshpPreview(Extractor):
                         "client": host,
                         "parameters": result,
                         "visualization_mimetype": "application/zip",
-                        "visualization_component_id": "geoserver-viewer-component"
+                        "visualization_component_id": "geoserver-vector-viewer-component"
                     })
                     headers = {
                         "X-API-KEY": secret_key,
