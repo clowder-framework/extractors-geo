@@ -1,6 +1,7 @@
 import errno
 
 from geoserver.catalog import Catalog
+from pyproj import Transformer
 import requests
 import os.path
 import tempfile
@@ -12,7 +13,7 @@ class Client:
     
     def __init__(self, geoserver, username, password):
         self.restserver = urlparse.urljoin(geoserver, 'rest/')
-        self.wmsserver = urlparse.urljoin(geoserver, 'wms')
+        self.wmsserver = urlparse.urljoin(geoserver, 'ows')
         self.username = username
         self.password = password
         self.catalog = Catalog(self.restserver, self.username, self.password) 
@@ -71,14 +72,26 @@ class Client:
             self.layer = layers[0]
             return self.layer
 
-    def mintMetadataWithoutGeoserver(self, workspace, filename, extent):
+    def mintMetadataWithoutGeoserver(self, workspace, filename, extent, epsg):
         self.logger.debug("Creating wms metadata ... ")
         metadata = {}
         wmsLayerName = workspace + ':' + filename
         metadata['WMS Layer Name'] = wmsLayerName
         metadata['WMS Service URL'] = self.wmsserver
+
+        # TODO: Extent should be in source coordinate system (e.g. latlon = 4326)
+        if epsg == "EPSG:4326":
+            # Initialize the transformer from EPSG:4326 to EPSG:3857
+            transformer = Transformer.from_crs("EPSG:3857", "EPSG:4326", always_xy=True)
+            bbox = extent.split(",")
+            # Convert the coordinates
+            min_x, min_y = transformer.transform(bbox[0], bbox[1])
+            max_x, max_y = transformer.transform(bbox[2], bbox[3])
+            extent = f"{min_x},{min_y},{max_x},{max_y}"
+            print(extent)
+
         metadata[
-            'WMS Layer URL'] = self.wmsserver + '?request=GetMap&layers=' + wmsLayerName + '&bbox=' + extent + '&width=640&height=480&srs=EPSG:3857&format=image%2Fpng'
+            'WMS Layer URL'] = self.wmsserver + '?service=WFS&version=1.0.0&request=GetFeature&typeName=' + wmsLayerName + '&bbox=' + extent + '&srsname=' + epsg + '&outputFormat=application%2Fjson'
 
         self.logger.debug('[DONE]')
         return metadata

@@ -65,7 +65,7 @@ class Utils:
                 self.zipShpProp['epsg'] = 'UNKNOWN'
                 self.zipShpProp['hasError'] = True
             else:
-                if epsg_code != 'None':
+                if epsg_code != 'None' and epsg_code != None:
                     self.zipShpProp['epsg'] = epsg_code
                 else:
                     self.zipShpProp['epsg'] = 'UNKNOWN'
